@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <form action="#" method="post">
+    <select name="anashim" multiple>
+          {% for p in people %}
+                 <option   value="{{p}}">{{p}}</option><br>
+            {% endfor %}
+    </select>
+<input type="submit">
+</form>
+
+<p>Hold down the Ctrl (windows) / Command (Mac) button to select multiple options.</p>
+
+
+</body>
+</html>

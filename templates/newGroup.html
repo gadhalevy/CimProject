@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>New Group</title>
+</head>
+<body>
+    <h1>New group for new project</h1>
+    <p>Project Name:</p>{{pName}}<br>
+    <p>Project Description:</p>{{pDesc}}</textarea><br>
+    <p><h2>Choose students:</h2></p>
+    <form  method="post" >
+        <select multiple name="talmid" >
+            {% for student in students %}
+                 <option id="talmid"  value="{{student.name}}">{{student.name}}</option><br>
+                 <!--input type="checkbox"  name="talmid" value="{{student.name}}">{{student.name}}<br-->
+                <!--option  value="{{student}}">{{student}}</option><br-->
+            {% endfor %}
+        </select>
+        <input type="submit">
+    </form>
+</body>
+</html>
