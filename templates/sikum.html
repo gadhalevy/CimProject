@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sikum</title>
+</head>
+<body>
+    <h4>Project name:{{pName}}</h4>
+    <br>
+    {% for l in lst %}
+        <p>{{ l }}</p>
+    {% endfor %}
+    <br>
+    {% for d in dvarim %}
+    <p> {{ d }} </p>
+    {% endfor %}
+    <br>
+    <form action="/" >
+    <button type='submit' >Submit</button>
+    </form>
+
+</body>
+</html>

@@ -103,19 +103,25 @@ def newGroup(pName,pDesc):
         students=session.query(Students).all()
         return render_template('newGroup.html',pName=pName,pDesc=pDesc,students=students)
 
+def mySplit(myLst):
+    mystr=str(myLst)
+    res=mystr.split(',')
+    newRes=[]
+    for r in res:
+        indx=r.find('\\')
+        newRes.append(r[3:indx])
+    return newRes
+
+
 @app.route('/newGear/<string:vals>/<string:pName>',methods=['GET','POST'])
 def newGear(vals,pName):
+    lst=mySplit(vals)
     if request.method=='POST':
-        pass
+        dvarim=request.form.getlist('davar')
+        return render_template('sikum.html',dvarim=dvarim,pName=pName,vals=vals,lst=lst)
     else:
-        print vals
-        s1,s2=vals.split(',')
-        indx=s1.find('\\')
-        s1=s1[3:indx]
-        indx=s2.find('\\')
-        s2=s2[3:indx]
-
-        return render_template('newGear.html',s1=s1,s2=s2,pName=pName)
+        things=session.query(Things).all()
+        return render_template('newGear.html',vals=vals,lst=lst,pName=pName,things=things)
 
 if __name__ == '__main__':
     app.debug = True

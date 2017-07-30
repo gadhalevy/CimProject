@@ -7,7 +7,17 @@
 <body>
     <h4>Project name:{{pName}}</h4>
     <h4>Students:</h4>
-    {{s1}}<br>
-    {{s2}}<br>
+    {% for l in lst %}
+        <p>{{ l }}</p>
+    {% endfor %}
+    <form method="post" >
+        <select multiple name="davar" >
+            {% for thing in things %}
+                 <option id="thing"  value="{{thing.name}}">{{thing.name}}</option><br>
+            {% endfor %}
+        </select>
+        <button type="submit">Submit</button>
+    </form>
+
 </body>
 </html>
