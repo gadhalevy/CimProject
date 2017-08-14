@@ -32,12 +32,18 @@ class Projects(Base):
     teur = Column(String(250), nullable=False)
     things=relationship('Things',secondary='thngsprojs')
 
+    def __repr__(self):
+        return "<Projects(name='%s')>" %self.name
+
 class Students(Base):
     __tablename__ = 'students'
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
     projectId = Column(Integer, ForeignKey('projects.id'))
     projects = relationship(Projects)
+
+    def __repr__(self):
+        return "<Students(name='%s',pId='%d')>" %(self.name,self.projectId)
 
 engine = create_engine('sqlite:///nisayon.db')
 

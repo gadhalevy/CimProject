@@ -14,7 +14,12 @@ session = DBSession()
 
 @app.route('/')
 def start():
-    return redirect(url_for('fillProjects'))
+    rep=session.query(Projects.name,Students.name,Things.name).join(Students,ThngsProjs).\
+        filter(Students.projectId!=1).\
+        filter(Things.id==ThngsProjs.idThings).\
+        all()
+    print len(rep)
+    return render_template('report.html',rep=rep)
 
 @app.route('/fillThings')
 def fillThings():
