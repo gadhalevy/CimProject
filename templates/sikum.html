@@ -5,18 +5,20 @@
     <title>Sikum</title>
 </head>
 <body>
-    <h4>Project name:{{pName}}</h4>
+    <h2>Project name:{{pName}}</h2>
     <br>
+    <h4>Members:</h4><br>
     {% for l in lst %}
         <p>{{ l }}</p>
     {% endfor %}
     <br>
+    <h4>Equipment:</h4><br>
     {% for d in dvarim %}
-    <p> {{ d }} </p>
+    <p> {{ d[0] }} </p>
     {% endfor %}
     <br>
     <form action="/" >
-    <button type='submit' >Submit</button>
+    <button type='submit' >New Project</button>
     </form>
 
 </body>

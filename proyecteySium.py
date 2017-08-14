@@ -3,7 +3,6 @@ from flask import Flask, render_template, request, redirect, jsonify, url_for
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base,ThngsProjs, Types,Things,Projects,Students
-import string
 app = Flask(__name__)
 
 
@@ -42,9 +41,7 @@ def fillThings():
         session.add(r)
         session.add(t)
         session.commit()
-
     return 'Done'
-
 
 @app.route('/fillStudent')
 def fillStudent():
@@ -63,9 +60,8 @@ def fillStudent():
     for l in lines[:-1]:
         id,first,last=l.split(',')
         print count,first+' '+last
-        # session.add(Students(id=count,name=first+' '+last,projectId=1)) #Hebrew try fix later
         try:
-            session.add(Students(id=count,name=first+' '+last,projectId=1)) #Hebrew try fix later
+            session.add(Students(id=count,name=first+' '+last)) #Hebrew try fix later
             session.commit()
         except:
             session.rollback()
@@ -78,7 +74,6 @@ def fillStudent():
     return output
     # return 'Students were created in DB'
 
-
 @app.route('/fillProject',methods=['GET','POST'])
 def fillProjects():
     if request.method == 'POST':
@@ -90,18 +85,9 @@ def fillProjects():
             session.commit()
         except:
             session.rollback()
-        return redirect(url_for('newGroup',pName=name,pDesc=teur))
+        return redirect(url_for('newGroup',pName=name,pDesc=teur,id=project.id))
     else:
         return render_template('newProject.html')
-
-@app.route('/newGroup/<string:pName>/<string:pDesc>',methods=['GET','POST'])
-def newGroup(pName,pDesc):
-    if request.method == 'POST':
-        vals=request.form.getlist('talmid')
-        return redirect(url_for('newGear',vals=vals,pName=pName))
-    else:
-        students=session.query(Students).all()
-        return render_template('newGroup.html',pName=pName,pDesc=pDesc,students=students)
 
 def mySplit(myLst):
     mystr=str(myLst)
@@ -112,13 +98,41 @@ def mySplit(myLst):
         newRes.append(r[3:indx])
     return newRes
 
+@app.route('/newGroup/<string:pName>/<string:pDesc>/<int:id>',methods=['GET','POST'])
+def newGroup(pName,pDesc,id):
+    if request.method == 'POST':
+        vals=request.form.getlist('talmid')
+        lst=mySplit(vals)
+        for l in lst:
+            try:
+                for s in session.query(Students).filter(Students.name.startswith(l[:5])):
+                    s.projectId=id
+                session.commit()
+            except:
+                session.rollback()
+        return redirect(url_for('newGear',vals=vals,pName=pName,id=id))
+    else:
+        students=session.query(Students).all()
+        return render_template('newGroup.html',pName=pName,pDesc=pDesc,students=students)
 
-@app.route('/newGear/<string:vals>/<string:pName>',methods=['GET','POST'])
-def newGear(vals,pName):
+@app.route('/newGear/<string:vals>/<string:pName>/<int:id>',methods=['GET','POST'])
+def newGear(vals,pName,id):
     lst=mySplit(vals)
+    rhivim=[]
     if request.method=='POST':
         dvarim=request.form.getlist('davar')
-        return render_template('sikum.html',dvarim=dvarim,pName=pName,vals=vals,lst=lst)
+        print dvarim
+        for d in dvarim:
+            thingInProj=ThngsProjs(idThings=d,idProj=id)
+            try:
+                session.add(thingInProj)
+                for s in session.query(Things.name).filter(Things.id=='%s' %d):
+                    rhivim.append(s)
+                session.commit()
+            except:
+                session.rollback()
+        print 'rhivim=',rhivim
+        return render_template('sikum.html',dvarim=rhivim,pName=pName,vals=vals,lst=lst)
     else:
         things=session.query(Things).all()
         return render_template('newGear.html',vals=vals,lst=lst,pName=pName,things=things)
