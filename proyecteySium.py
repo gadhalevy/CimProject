@@ -18,8 +18,26 @@ def start():
         filter(Students.projectId!=1).\
         filter(Things.id==ThngsProjs.idThings).\
         all()
-    print len(rep)
-    return render_template('report.html',rep=rep)
+    lst=[]
+    stuSet=set()
+    thingSet=set()
+    prev=rep[0][0]
+    for r in rep:
+        cur=r[0]
+        if cur==prev:
+            stuSet.add(r[1])
+            thingSet.add(r[2])
+        else:
+            lst.append(prev)
+            lst.append(stuSet)
+            lst.append(thingSet)
+            prev=cur
+            stuSet=set()
+            thingSet=set()
+    lst.append(cur)
+    lst.append(stuSet)
+    lst.append(thingSet)
+    return render_template('report.html',rep=lst)
 
 @app.route('/fillThings')
 def fillThings():
