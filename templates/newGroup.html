@@ -1,21 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>New Group</title>
-</head>
-<body>
+{% extends "bootstrap/base.html" %}
+{% block title %}
+    New Group
+{% endblock %}
+{% block content %}
     <h1>New group for new project</h1>
-    <p>Project Name:</p>{{pName}}<br>
-    <p>Project Description:</p>{{pDesc}}</textarea><br>
+    <p>Project Name:</p>{{pName}}
+    <p>Project Description:</p>{{pDesc}}</textarea>
     <p><h2>Choose students:</h2></p>
     <form method="post">
-        <select multiple name="talmid" >
+        <select multiple name="talmid" class="form-control">
             {% for student in students %}
                  <option id="talmid"  value="{{student.name}}">{{student.name}}</option><br>
             {% endfor %}
         </select>
-        <button type="submit">Submit</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
     </form>
-</body>
-</html>
+{% endblock %}
