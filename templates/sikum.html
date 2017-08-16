@@ -3,6 +3,7 @@
     Sikum
 {% endblock %}
 {% block content %}
+<div class="container" >
     <h2>Project name:{{pName}}</h2>
     <h4>Members:</h4>
     {% for l in lst %}
@@ -15,4 +16,5 @@
     <form action="/" >
     <button type='submit' class="btn btn-primary">Show All Projects</button>
     </form>
+</div>
 {% endblock %}

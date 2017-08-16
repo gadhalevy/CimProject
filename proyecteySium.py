@@ -4,9 +4,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base,ThngsProjs, Types,Things,Projects,Students
 from flask_bootstrap import Bootstrap
+from forms import NewProj
 app = Flask(__name__)
 Bootstrap(app)
-
+app.secret_key = 'development key'
 
 engine = create_engine('sqlite:///nisayon.db')
 Base.metadata.bind = engine
@@ -101,9 +102,10 @@ def fillStudent():
 
 @app.route('/fillProject',methods=['GET','POST'])
 def fillProjects():
+    form=NewProj()
     if request.method == 'POST':
-        name=request.form['pName']
-        teur=request.form['pDesc']
+        name=form.name.data
+        teur=form.teur.data
         project = Projects(name=name,teur=teur)
         try:
             session.add(project)
@@ -112,7 +114,7 @@ def fillProjects():
             session.rollback()
         return redirect(url_for('newGroup',pName=name,pDesc=teur,id=project.id))
     else:
-        return render_template('newProject.html')
+        return render_template('newProject.html',form=form)
 
 def mySplit(myLst):
     mystr=str(myLst)
@@ -135,6 +137,7 @@ def newGroup(pName,pDesc,id):
                 session.commit()
             except:
                 session.rollback()
+        print 'PName=',pName,'id=',id
         return redirect(url_for('newGear',vals=vals,pName=pName,id=id))
     else:
         students=session.query(Students).all()
