@@ -3,17 +3,24 @@
     Report
 {% endblock %}
 {% block content %}
-        <h4>Projects:</h4>
+    <table class="table-bordered">
+    <thead>
+      <tr>
+        <th>Projects</th>
+        <th>Students</th>
+        <th>Equipment</th>
+      </tr>
+    </thead>
         {% for r in rep %}
             {% if loop.index0 % 3 ==0 %}
-            <p><b>Name:</b> {{ ','.join(r) }}</p>
+            <tr>
+            <td> {{ ','.join(r) }}</td>
             {% elif loop.index0 % 3 ==1 %}
-            <p><b>Students:</b> {{ ','.join(r) }}</p>
+            <td> {{ ','.join(r) }}</td>
             {% elif loop.index0 % 3 ==2 %}
-            <p><b>Equipment:</b> {{ ','.join(r) }}</p>
+            <td> {{ ','.join(r) }}</td></tr>
             {% endif %}
         {% endfor %}
-
         <form action="/fillProject" >
         <button type='submit' class="btn btn-primary">New Project</button>
         </form>
