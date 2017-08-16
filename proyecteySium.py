@@ -3,7 +3,9 @@ from flask import Flask, render_template, request, redirect, jsonify, url_for
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base,ThngsProjs, Types,Things,Projects,Students
+from flask_bootstrap import Bootstrap
 app = Flask(__name__)
+Bootstrap(app)
 
 
 engine = create_engine('sqlite:///nisayon.db')

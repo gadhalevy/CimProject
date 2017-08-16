@@ -1,19 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Report</title>
-</head>
-<body>
-    <br>
-    <h4>Projects:</h4><br>
-    {% for r in rep %}
-        <p>{{ ','.join(r) }}</p>
-    {% endfor %}
-    <br>
-    <form action="/fillProject" >
-    <button type='submit' >New Project</button>
-    </form>
+{% extends "bootstrap/base.html" %}
+{% block title %}
+    Report
+{% endblock %}
+{% block content %}
+        <h4>Projects:</h4>
+        {% for r in rep %}
+            {% if loop.index0 % 3 ==0 %}
+            <p><b>Name:</b> {{ ','.join(r) }}</p>
+            {% elif loop.index0 % 3 ==1 %}
+            <p><b>Students:</b> {{ ','.join(r) }}</p>
+            {% elif loop.index0 % 3 ==2 %}
+            <p><b>Equipment:</b> {{ ','.join(r) }}</p>
+            {% endif %}
+        {% endfor %}
 
-</body>
-</html>
+        <form action="/fillProject" >
+        <button type='submit' class="btn btn-primary">New Project</button>
+        </form>
+{% endblock %}
