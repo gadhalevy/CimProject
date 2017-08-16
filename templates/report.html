@@ -21,7 +21,8 @@
             <td> {{ ','.join(r) }}</td></tr>
             {% endif %}
         {% endfor %}
+        </table>
         <form action="/fillProject" >
         <button type='submit' class="btn btn-primary">New Project</button>
         </form>
-{% endblock %}
+    {% endblock %}
