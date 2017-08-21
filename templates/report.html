@@ -15,7 +15,7 @@
         {% for r in rep %}
             {% if loop.index0 % 3 ==0 %}
             <tr>
-            <td> {{ ','.join(r) }}</td>
+            <td><a href = "{{url_for('editProject',projectName = r )}}">{{ r }}</a> </td>
             {% elif loop.index0 % 3 ==1 %}
             <td> {{ ','.join(r) }}</td>
             {% elif loop.index0 % 3 ==2 %}
@@ -26,5 +26,6 @@
         <form action="/fillProject" >
         <button type='submit' class="btn btn-primary">New Project</button>
         </form>
+    <h3>To edit a project please press the left mouse button on its name.</h3>
 </div>
     {% endblock %}

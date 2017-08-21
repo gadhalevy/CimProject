@@ -1,0 +1,33 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}
+    Edit Project
+{% endblock %}
+{% block content %}
+    <p><h2>Edit Project:</h2></p>
+    <form method="post" >
+    <div class="container" >
+        <h4>Current Name: {{ projects.name }}</h4>
+        <h4>Current Description: {{ projects.teur }}</h4>
+        {{ wtf.quick_form(form) }}
+    <label for="talmid">Select Student:</label>
+    <select multiple name="talmid" class="form-control">
+            {% for ta in talmidim %}
+                {% for s in students %}
+                    <option id="talmid" value="{{ta.id}}" {% if s.name==ta.name %} selected=True {% endif %}>{{ ta.name }}</option><br>
+                {% endfor %}
+            {% endfor %}
+    </select><br>
+    <label for="davar">Select Equipment:</label>
+    <select multiple name="davar" class="form-control">
+            {% for d in dvarim %}
+                {% for t in things %}
+                    <option id="davar" value="{{d.id}}" {% if d.id==t.id %} selected=True {% endif %}>{{ d.name }}</option><br>
+                {% endfor %}
+            {% endfor %}
+    </select><br>
+    <button type="submit" class="btn btn-primary">Edit</button>
+        </div>
+    </form>
+
+{% endblock %}

@@ -20,7 +20,7 @@ class Types(Base):
 class Things(Base):
     __tablename__ = 'things'
     id = Column(Integer, primary_key=True)
-    name = Column(String(50), nullable=False)
+    name = Column(String(50), nullable=False,unique=True)
     typeId = Column(Integer, ForeignKey('types.id'))
     types = relationship(Types)
     projects=relationship('Projects',secondary='thngsprojs')
@@ -28,7 +28,7 @@ class Things(Base):
 class Projects(Base):
     __tablename__ = 'projects'
     id = Column(Integer, primary_key=True)
-    name = Column(String(50), nullable=False)
+    name = Column(String(50), nullable=False,unique=True)
     teur = Column(String(250), nullable=False)
     things=relationship('Things',secondary='thngsprojs')
 

@@ -18,3 +18,5 @@ class NewProj(FlaskForm):
     teur=StringField(u'Description', widget=TextArea(),validators=[DataRequired()])
     submit = SubmitField("Define Group")
 
+
+

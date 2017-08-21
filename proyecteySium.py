@@ -2,9 +2,13 @@ __author__ = 'gadh'
 from flask import Flask, render_template, request, redirect, jsonify, url_for
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql import exists
 from database_setup import Base,ThngsProjs, Types,Things,Projects,Students
 from flask_bootstrap import Bootstrap
-from forms import NewProj
+from flask_wtf import FlaskForm
+from wtforms import StringField,SubmitField
+from wtforms.validators import DataRequired
+from wtforms.widgets import TextArea
 app = Flask(__name__)
 Bootstrap(app)
 app.secret_key = 'development key'
@@ -14,6 +18,16 @@ Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+class NewProj(FlaskForm):
+    name = StringField('name', validators=[DataRequired()])
+    teur=StringField(u'Description', widget=TextArea(),validators=[DataRequired()])
+    submit = SubmitField("Define Group")
+
+class Edit(FlaskForm):
+    name = StringField('New Name', validators=[DataRequired()])
+    descr=StringField('New Description', widget=TextArea(),validators=[DataRequired()])
+
 
 @app.route('/')
 def start():
@@ -164,6 +178,62 @@ def newGear(vals,pName,id):
     else:
         things=session.query(Things).all()
         return render_template('newGear.html',vals=vals,lst=lst,pName=pName,things=things)
+
+@app.route('/editProject/<string:projectName>',methods=['GET','POST'])
+def editProject(projectName):
+    form=Edit()
+    editedProject = session.query(Projects).filter_by(name=projectName).one()
+    if request.method=='POST':
+        name=form.name.data
+        descr=form.descr.data
+        members=request.form.getlist("talmid")
+        equipment=request.form.getlist("davar")
+        editedProject.name=name
+        editedProject.teur=descr
+        try:
+            session.add(editedProject)
+            session.commit()
+        except:
+            session.rollback()
+        men=session.query(Students).filter(Students.projectId==editedProject.id).all()
+        for m in men:
+            m.projectId=1
+            try:
+                session.add(m)
+                session.commit()
+            except:
+                session.rollback()
+        for m in members:
+            talmid=session.query(Students).filter(Students.id==m).one()
+            talmid.projectId=editedProject.id
+            try:
+                session.add(talmid)
+                session.commit()
+            except:
+                session.rollback()
+        tmps=session.query(ThngsProjs).filter(ThngsProjs.idProj==editedProject.id).all()
+        for t in tmps:
+            try:
+                session.delete(t)
+                session.commit()
+            except:
+                session.rollback()
+        for e in equipment:
+            davar=ThngsProjs(idThings=e,idProj=editedProject.id)
+            try:
+                session.add(davar)
+                session.commit()
+            except:
+                session.rollback()
+        return redirect(url_for('start'))
+    else:
+        students=session.query(Students).filter(Students.projectId==editedProject.id).all()
+        talmidim=session.query(Students).all()
+        things=session.query(Things).filter(Things.id==ThngsProjs.idThings).\
+            filter(ThngsProjs.idProj==editedProject.id).all()
+        dvarim=session.query(Things).all()
+        return render_template('editProject.html',form=form,projects=editedProject,students=students,things=things,talmidim=talmidim,dvarim=dvarim)
+
 
 if __name__ == '__main__':
     app.debug = True
