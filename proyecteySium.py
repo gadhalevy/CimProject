@@ -24,9 +24,11 @@ class NewProj(FlaskForm):
     teur=StringField(u'Description', widget=TextArea(),validators=[DataRequired()])
     submit = SubmitField("Define Group")
 
-class Edit(FlaskForm):
-    name = StringField('New Name', validators=[DataRequired()])
-    descr=StringField('New Description', widget=TextArea(),validators=[DataRequired()])
+# class Edit(FlaskForm):
+#     def __init__(self,shem,teur,*args, **kwargs):
+#         super(Edit,self).__init__(*args, **kwargs)
+#         self.name = StringField('New Name', validators=[DataRequired()],default=shem)
+#         self.descr=StringField('New Description', widget=TextArea(),validators=[DataRequired()],default=teur)
 
 
 @app.route('/')
@@ -181,11 +183,11 @@ def newGear(vals,pName,id):
 
 @app.route('/editProject/<string:projectName>',methods=['GET','POST'])
 def editProject(projectName):
-    form=Edit()
     editedProject = session.query(Projects).filter_by(name=projectName).one()
+    # form = Edit(editedProject.name,editedProject.teur)
     if request.method=='POST':
-        name=form.name.data
-        descr=form.descr.data
+        name=request.form["shem"]
+        descr=request.form["teur"]
         members=request.form.getlist("talmid")
         equipment=request.form.getlist("davar")
         editedProject.name=name
@@ -232,7 +234,7 @@ def editProject(projectName):
         things=session.query(Things).filter(Things.id==ThngsProjs.idThings).\
             filter(ThngsProjs.idProj==editedProject.id).all()
         dvarim=session.query(Things).all()
-        return render_template('editProject.html',form=form,projects=editedProject,students=students,things=things,talmidim=talmidim,dvarim=dvarim)
+        return render_template('editProject.html',projects=editedProject,students=students,things=things,talmidim=talmidim,dvarim=dvarim)
 
 
 if __name__ == '__main__':
