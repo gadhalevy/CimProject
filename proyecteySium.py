@@ -1,5 +1,5 @@
 __author__ = 'gadh'
-from flask import Flask, render_template, request, redirect, jsonify, url_for
+from flask import Flask, render_template, request, redirect, url_for,session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base,ThngsProjs, Types,Things,Projects,Students
@@ -18,7 +18,7 @@ Base.metadata.create_all(engine)
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
-session = DBSession()
+dbSession = DBSession()
 
 class NewProj(FlaskForm):
     name = StringField('name', validators=[DataRequired()])
@@ -36,7 +36,7 @@ class makeGrade(FlaskForm):
     submit = SubmitField("Grade Project")
 
 def makeQuery():
-    rep=session.query(Projects.name,Students.name,Things.name).join(Students,ThngsProjs).\
+    rep=dbSession.query(Projects.name,Students.name,Things.name).join(Students,ThngsProjs).\
         filter(Things.id==ThngsProjs.idThings).\
         all()
     try:
@@ -65,6 +65,7 @@ def makeQuery():
 
 @app.route('/')
 def start():
+    session.pop('username',None)
     lst=makeQuery()
     return render_template('report.html',rep=lst)
 
@@ -72,31 +73,31 @@ def start():
 def fillThings():
     'Include types of things'
     try:
-        session.query(Types).delete()
-        session.query(Things).delete()
-        session.commit()
+        dbSession.query(Types).delete()
+        dbSession.query(Things).delete()
+        dbSession.commit()
     except:
-        session.rollback()
+        dbSession.rollback()
         return 'Types were not deleted'
     robot=Types(id=1,name='robot')
     lego=Types(id=2,name='lego')
     tablet=Types(id=3,name='tablet')
     for i in robot,lego,tablet:
-        session.add(i)
-    session.commit()
+        dbSession.add(i)
+    dbSession.commit()
     legoNames=('Arafat1','Bibi2','Sara3','OHazan4','MAtias5','Bugi6','DBlat7','Tayson8','GGadot9','NBenet10','YLapid11')
     for l in range(len(legoNames)):
         sug=Things(id=l,name=legoNames[l],types=lego)
-        session.add(sug)
-        session.commit()
+        dbSession.add(sug)
+        dbSession.commit()
     for l in range(len(legoNames),len(legoNames)+6):
         r=Things(id=l,name='r%s' %str(l-len(legoNames)+1) ,types=robot)
-        session.add(r)
-        session.commit()
+        dbSession.add(r)
+        dbSession.commit()
     for l in range(len(legoNames)+6,len(legoNames)+12):
         t=Things(id=l,name='t%s' %str(l-(len(legoNames)+5)) ,types=tablet)
-        session.add(t)
-        session.commit()
+        dbSession.add(t)
+        dbSession.commit()
     return 'Done'
 
 @app.route('/fillStudent')
@@ -110,12 +111,12 @@ def fillStudent():
         _,first,last=l.split(',')
         print count,first+' '+last
         try:
-            session.add(Students(id=count,name=first+' '+last)) #Hebrew try fix later
-            session.commit()
+            dbSession.add(Students(id=count,name=first+' '+last)) #Hebrew try fix later
+            dbSession.commit()
         except:
-            session.rollback()
+            dbSession.rollback()
         count+=1
-    q=session.query(Students).all()
+    q=dbSession.query(Students).all()
     output = ''
     for i in q:
         output += str(i.id)+' '+i.name+'<br>'
@@ -130,10 +131,10 @@ def fillProjects():
         teur=form.teur.data
         project = Projects(name=name,teur=teur,guide='cimlab',grade=55)
         try:
-            session.add(project)
-            session.commit()
+            dbSession.add(project)
+            dbSession.commit()
         except:
-            session.rollback()
+            dbSession.rollback()
         return redirect(url_for('newGroup',pName=name,pDesc=teur,id=project.id))
     else:
         return render_template('newProject.html',form=form)
@@ -154,15 +155,15 @@ def newGroup(pName,pDesc,id):
         lst=mySplit(vals)
         for l in lst:
             try:
-                for s in session.query(Students).filter(Students.name.startswith(l[:5])):
+                for s in dbSession.query(Students).filter(Students.name.startswith(l[:5])):
                     s.projectId=id
-                session.commit()
+                dbSession.commit()
             except:
-                session.rollback()
+                dbSession.rollback()
         print 'PName=',pName,'id=',id
         return redirect(url_for('newGear',vals=vals,pName=pName,id=id))
     else:
-        students=session.query(Students).all()
+        students=dbSession.query(Students).all()
         return render_template('newGroup.html',pName=pName,pDesc=pDesc,students=students)
 
 @app.route('/newGear/<string:vals>/<string:pName>/<int:id>',methods=['GET','POST'])
@@ -175,21 +176,21 @@ def newGear(vals,pName,id):
         for d in dvarim:
             thingInProj=ThngsProjs(idThings=d,idProj=id)
             try:
-                session.add(thingInProj)
-                for s in session.query(Things.name).filter(Things.id=='%s' %d):
+                dbSession.add(thingInProj)
+                for s in dbSession.query(Things.name).filter(Things.id=='%s' %d):
                     rhivim.append(s)
-                session.commit()
+                dbSession.commit()
             except:
-                session.rollback()
+                dbSession.rollback()
         print 'rhivim=',rhivim
         return render_template('sikum.html',dvarim=rhivim,pName=pName,vals=vals,lst=lst)
     else:
-        things=session.query(Things).all()
+        things=dbSession.query(Things).all()
         return render_template('newGear.html',vals=vals,lst=lst,pName=pName,things=things)
 
 @app.route('/editProject/<string:projectName>',methods=['GET','POST'])
 def editProject(projectName):
-    editedProject = session.query(Projects).filter_by(name=projectName).one()
+    editedProject = dbSession.query(Projects).filter_by(name=projectName).one()
     if request.method=='POST':
         name=request.form["shem"]
         descr=request.form["teur"]
@@ -198,59 +199,58 @@ def editProject(projectName):
         editedProject.name=name
         editedProject.teur=descr
         try:
-            session.add(editedProject)
-            session.commit()
+            dbSession.add(editedProject)
+            dbSession.commit()
         except:
-            session.rollback()
-        men=session.query(Students).filter(Students.projectId==editedProject.id).all()
+            dbSession.rollback()
+        men=dbSession.query(Students).filter(Students.projectId==editedProject.id).all()
         for m in men:
             m.projectId=''
             try:
-                session.add(m)
-                session.commit()
+                dbSession.add(m)
+                dbSession.commit()
             except:
-                session.rollback()
+                dbSession.rollback()
         for m in members:
-            talmid=session.query(Students).filter(Students.id==m).one()
+            talmid=dbSession.query(Students).filter(Students.id==m).one()
             talmid.projectId=editedProject.id
             try:
-                session.add(talmid)
-                session.commit()
+                dbSession.add(talmid)
+                dbSession.commit()
             except:
-                session.rollback()
-        tmps=session.query(ThngsProjs).filter(ThngsProjs.idProj==editedProject.id).all()
+                dbSession.rollback()
+        tmps=dbSession.query(ThngsProjs).filter(ThngsProjs.idProj==editedProject.id).all()
         for t in tmps:
             try:
-                session.delete(t)
-                session.commit()
+                dbSession.delete(t)
+                dbSession.commit()
             except:
-                session.rollback()
+                dbSession.rollback()
         for e in equipment:
             davar=ThngsProjs(idThings=e,idProj=editedProject.id)
             try:
-                session.add(davar)
-                session.commit()
+                dbSession.add(davar)
+                dbSession.commit()
             except:
-                session.rollback()
+                dbSession.rollback()
         return redirect(url_for('start'))
     else:
-        students=session.query(Students).filter(Students.projectId==editedProject.id).all()
-        talmidim=session.query(Students).all()
-        things=session.query(Things).filter(Things.id==ThngsProjs.idThings).\
+        students=dbSession.query(Students).filter(Students.projectId==editedProject.id).all()
+        talmidim=dbSession.query(Students).all()
+        things=dbSession.query(Things).filter(Things.id==ThngsProjs.idThings).\
             filter(ThngsProjs.idProj==editedProject.id).all()
-        dvarim=session.query(Things).all()
+        dvarim=dbSession.query(Things).all()
         return render_template('editProject.html',projects=editedProject,students=students,things=things,talmidim=talmidim,dvarim=dvarim)
 
 @app.route('/secret-page',methods=['GET','POST'])
 @requires_auth
 def secret_page():
-    lst=makeQuery()
-    print 'lst=',lst
-    return render_template('secret_page.html',rep=lst)
+    projects=dbSession.query(Projects).all()
+    return render_template('secret_page.html',projects=projects)
 
 @app.route('/gradeProject/<string:projectName>',methods=['GET','POST'])
 def gradeProject(projectName):
-    gradedProject = session.query(Projects).filter_by(name=projectName).one()
+    gradedProject = dbSession.query(Projects).filter_by(name=projectName).one()
     form = makeGrade()
     if request.method=="POST":
         guide = form.guide.data
@@ -258,11 +258,11 @@ def gradeProject(projectName):
         gradedProject.guide = guide
         gradedProject.grade = grade
         try:
-            session.add(gradedProject)
-            session.commit()
+            dbSession.add(gradedProject)
+            dbSession.commit()
         except:
-            session.rollback()
-        projects=session.query(Projects).all()
+            dbSession.rollback()
+        projects=dbSession.query(Projects).all()
         return render_template('summary.html',projects=projects)
     else:
         return render_template('grade.html',form=form,projectName=projectName)
