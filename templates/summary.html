@@ -1,0 +1,26 @@
+{% extends "bootstrap/base.html" %}
+{% block title %}
+    Report
+{% endblock %}
+{% block content %}
+    <div class="container" >
+    <table class="table-bordered">
+    <thead>
+      <tr>
+        <th>Project Name</th>
+        <th>Guide Name</th>
+        <th>Grade</th>
+      </tr>
+    </thead>
+        {% for p in projects %}
+            <tr>
+            <td> {{ p.name }} </td>
+            <td> {{ p.guide }}</td>
+            <td> {{ p.grade }}</td></tr>
+        {% endfor %}
+        </table><br>
+        <form action="/" >
+        <button type='submit' class="btn btn-primary">Show Projects</button>
+        </form>
+</div>
+    {% endblock %}

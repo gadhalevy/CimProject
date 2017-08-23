@@ -3,6 +3,7 @@
     Report
 {% endblock %}
 {% block content %}
+{% if rep!=[] %}
 <div class="container" >
     <table class="table-bordered">
     <thead>
@@ -22,10 +23,13 @@
             <td> {{ ','.join(r) }}</td></tr>
             {% endif %}
         {% endfor %}
-        </table>
+        </table><br>
+        <h3>To edit a project please press the left mouse button on its name.</h3>
+    {% else %}
+    <h4>You haven't define projects yet!</h4>
+    {% endif %}
         <form action="/fillProject" >
         <button type='submit' class="btn btn-primary">New Project</button>
         </form>
-    <h3>To edit a project please press the left mouse button on its name.</h3>
 </div>
     {% endblock %}

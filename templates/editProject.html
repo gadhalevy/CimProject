@@ -7,10 +7,8 @@
     <p><h2>Edit Project:</h2></p>
     <form method="post" >
     <div class="container" >
-        <!--h4>Current Name: {{ projects.name }}</h4>
-        <h4>Current Description: {{ projects.teur }}</h4-->
-        <b>Current Project Name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b><input type="text" value="{{ projects.name }}" name="shem"><br>
-        <b>Current Project Description</b><textarea name="teur" &nbsp;>{{ projects.teur }}</textarea><br>
+        <b>Current Project Name: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b><input type="text" value="{{ projects.name }}" name="shem"><br>
+        <b>Current Project Description:</b>&nbsp;&nbsp;&nbsp;<textarea name="teur" >{{ projects.teur }}</textarea><br>
     <label for="talmid">Select Student:</label>
     <select multiple name="talmid" class="form-control">
             {% for ta in talmidim %}

@@ -2,18 +2,19 @@ __author__ = 'gadh'
 from flask import Flask, render_template, request, redirect, jsonify, url_for
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.sql import exists
 from database_setup import Base,ThngsProjs, Types,Things,Projects,Students
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
-from wtforms import StringField,SubmitField
+from wtforms import StringField,SubmitField,IntegerField,ValidationError,SelectField
 from wtforms.validators import DataRequired
 from wtforms.widgets import TextArea
+from auth import requires_auth
 app = Flask(__name__)
 Bootstrap(app)
 app.secret_key = 'development key'
 
-engine = create_engine('sqlite:///nisayon.db')
+engine = create_engine('sqlite:///try.db')
+Base.metadata.create_all(engine)
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
@@ -24,38 +25,47 @@ class NewProj(FlaskForm):
     teur=StringField(u'Description', widget=TextArea(),validators=[DataRequired()])
     submit = SubmitField("Define Group")
 
-# class Edit(FlaskForm):
-#     def __init__(self,shem,teur,*args, **kwargs):
-#         super(Edit,self).__init__(*args, **kwargs)
-#         self.name = StringField('New Name', validators=[DataRequired()],default=shem)
-#         self.descr=StringField('New Description', widget=TextArea(),validators=[DataRequired()],default=teur)
+def myFieldCheck(form,field):
+    if field.data<50 or field.data>100:
+        raise ValidationError('Field must be between 50 and 100')
 
+class makeGrade(FlaskForm):
+    guides = ['Sol', 'Yifaat', 'Dana', 'Gad']
+    guide = SelectField(choices=zip(guides,guides))
+    grade = IntegerField('Grade', validators=[myFieldCheck])
+    submit = SubmitField("Grade Project")
+
+def makeQuery():
+    rep=session.query(Projects.name,Students.name,Things.name).join(Students,ThngsProjs).\
+        filter(Things.id==ThngsProjs.idThings).\
+        all()
+    try:
+        lst=[]
+        stuSet=set()
+        thingSet=set()
+        prev=rep[0][0]
+        for r in rep:
+            cur=r[0]
+            if cur==prev:
+                stuSet.add(r[1])
+                thingSet.add(r[2])
+            else:
+                lst.append(prev)
+                lst.append(stuSet)
+                lst.append(thingSet)
+                prev=cur
+                stuSet=set()
+                thingSet=set()
+        lst.append(cur)
+        lst.append(stuSet)
+        lst.append(thingSet)
+    except IndexError:
+        pass
+    return lst
 
 @app.route('/')
 def start():
-    rep=session.query(Projects.name,Students.name,Things.name).join(Students,ThngsProjs).\
-        filter(Students.projectId!=1).\
-        filter(Things.id==ThngsProjs.idThings).\
-        all()
-    lst=[]
-    stuSet=set()
-    thingSet=set()
-    prev=rep[0][0]
-    for r in rep:
-        cur=r[0]
-        if cur==prev:
-            stuSet.add(r[1])
-            thingSet.add(r[2])
-        else:
-            lst.append(prev)
-            lst.append(stuSet)
-            lst.append(thingSet)
-            prev=cur
-            stuSet=set()
-            thingSet=set()
-    lst.append(cur)
-    lst.append(stuSet)
-    lst.append(thingSet)
+    lst=makeQuery()
     return render_template('report.html',rep=lst)
 
 @app.route('/fillThings')
@@ -74,33 +84,30 @@ def fillThings():
     for i in robot,lego,tablet:
         session.add(i)
     session.commit()
-    legoNames=('Arafat1','Bibi2','Sara3')
+    legoNames=('Arafat1','Bibi2','Sara3','OHazan4','MAtias5','Bugi6','DBlat7','Tayson8','GGadot9','NBenet10','YLapid11')
     for l in range(len(legoNames)):
         sug=Things(id=l,name=legoNames[l],types=lego)
-        r=Things(id=l+len(legoNames),name='r%s' %str(l+len(legoNames)) ,types=robot)
-        t=Things(id=l+2*len(legoNames),name='t%s' %str(l+2*len(legoNames)) ,types=tablet)
         session.add(sug)
+        session.commit()
+    for l in range(len(legoNames),len(legoNames)+6):
+        r=Things(id=l,name='r%s' %str(l-len(legoNames)+1) ,types=robot)
         session.add(r)
+        session.commit()
+    for l in range(len(legoNames)+6,len(legoNames)+12):
+        t=Things(id=l,name='t%s' %str(l-(len(legoNames)+5)) ,types=tablet)
         session.add(t)
         session.commit()
     return 'Done'
 
 @app.route('/fillStudent')
 def fillStudent():
-    session.rollback()
-    try:
-        damy=Projects(id=1,name='dumy',teur='Stam lhazana')
-        session.add(damy)
-        session.commit()
-    except:
-        session.rollback()
     f=open('engStudents.csv','r')
     txt=f.read()
     lines=txt.split('\n')
     f.close()
     count=1
     for l in lines[:-1]:
-        id,first,last=l.split(',')
+        _,first,last=l.split(',')
         print count,first+' '+last
         try:
             session.add(Students(id=count,name=first+' '+last)) #Hebrew try fix later
@@ -111,8 +118,7 @@ def fillStudent():
     q=session.query(Students).all()
     output = ''
     for i in q:
-        output += i.name
-        output += '</br>'
+        output += str(i.id)+' '+i.name+'<br>'
     return output
     # return 'Students were created in DB'
 
@@ -122,7 +128,7 @@ def fillProjects():
     if request.method == 'POST':
         name=form.name.data
         teur=form.teur.data
-        project = Projects(name=name,teur=teur)
+        project = Projects(name=name,teur=teur,guide='cimlab',grade=55)
         try:
             session.add(project)
             session.commit()
@@ -184,7 +190,6 @@ def newGear(vals,pName,id):
 @app.route('/editProject/<string:projectName>',methods=['GET','POST'])
 def editProject(projectName):
     editedProject = session.query(Projects).filter_by(name=projectName).one()
-    # form = Edit(editedProject.name,editedProject.teur)
     if request.method=='POST':
         name=request.form["shem"]
         descr=request.form["teur"]
@@ -199,7 +204,7 @@ def editProject(projectName):
             session.rollback()
         men=session.query(Students).filter(Students.projectId==editedProject.id).all()
         for m in men:
-            m.projectId=1
+            m.projectId=''
             try:
                 session.add(m)
                 session.commit()
@@ -235,6 +240,32 @@ def editProject(projectName):
             filter(ThngsProjs.idProj==editedProject.id).all()
         dvarim=session.query(Things).all()
         return render_template('editProject.html',projects=editedProject,students=students,things=things,talmidim=talmidim,dvarim=dvarim)
+
+@app.route('/secret-page',methods=['GET','POST'])
+@requires_auth
+def secret_page():
+    lst=makeQuery()
+    print 'lst=',lst
+    return render_template('secret_page.html',rep=lst)
+
+@app.route('/gradeProject/<string:projectName>',methods=['GET','POST'])
+def gradeProject(projectName):
+    gradedProject = session.query(Projects).filter_by(name=projectName).one()
+    form = makeGrade()
+    if request.method=="POST":
+        guide = form.guide.data
+        grade = form.grade.data
+        gradedProject.guide = guide
+        gradedProject.grade = grade
+        try:
+            session.add(gradedProject)
+            session.commit()
+        except:
+            session.rollback()
+        projects=session.query(Projects).all()
+        return render_template('summary.html',projects=projects)
+    else:
+        return render_template('grade.html',form=form,projectName=projectName)
 
 
 if __name__ == '__main__':
