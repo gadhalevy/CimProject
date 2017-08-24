@@ -6,7 +6,7 @@ from database_setup import Base,ThngsProjs, Types,Things,Projects,Students
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
 from wtforms.validators import DataRequired
-from wtforms import StringField,SubmitField,IntegerField,ValidationError,SelectField,PasswordField,validators
+from wtforms import StringField,SubmitField,IntegerField,ValidationError,SelectField,PasswordField
 
 from wtforms.widgets import TextArea
 
@@ -14,7 +14,7 @@ app = Flask(__name__)
 Bootstrap(app)
 app.secret_key = 'development key'
 
-engine = create_engine('sqlite:///try.db')
+engine = create_engine('postgresql:///try.db')
 Base.metadata.create_all(engine)
 Base.metadata.bind = engine
 
