@@ -5,10 +5,11 @@ from sqlalchemy.orm import sessionmaker
 from database_setup import Base,ThngsProjs, Types,Things,Projects,Students
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
-from wtforms import StringField,SubmitField,IntegerField,ValidationError,SelectField
 from wtforms.validators import DataRequired
+from wtforms import StringField,SubmitField,IntegerField,ValidationError,SelectField,PasswordField,validators
+
 from wtforms.widgets import TextArea
-from auth import requires_auth
+
 app = Flask(__name__)
 Bootstrap(app)
 app.secret_key = 'development key'
@@ -20,9 +21,11 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 dbSession = DBSession()
 
+Guides = ['Sol', 'Yifaat', 'Dana', 'Gad']
+
 class NewProj(FlaskForm):
-    name = StringField('name', validators=[DataRequired()])
-    teur=StringField(u'Description', widget=TextArea(),validators=[DataRequired()])
+    name = StringField('name', validators=[DataRequired])
+    teur=StringField(u'Description', validators=[DataRequired],widget=TextArea())
     submit = SubmitField("Define Group")
 
 def myFieldCheck(form,field):
@@ -30,10 +33,14 @@ def myFieldCheck(form,field):
         raise ValidationError('Field must be between 50 and 100')
 
 class makeGrade(FlaskForm):
-    guides = ['Sol', 'Yifaat', 'Dana', 'Gad']
-    guide = SelectField(choices=zip(guides,guides))
+    guide = SelectField(choices=zip(Guides,Guides))
     grade = IntegerField('Grade', validators=[myFieldCheck])
     submit = SubmitField("Grade Project")
+
+class Login(FlaskForm):
+    guide = SelectField(choices=zip(Guides,Guides))
+    password = PasswordField('Password',validators=[DataRequired])
+    submit = SubmitField("Check Password")
 
 def makeQuery():
     rep=dbSession.query(Projects.name,Students.name,Things.name).join(Students,ThngsProjs).\
@@ -243,10 +250,18 @@ def editProject(projectName):
         return render_template('editProject.html',projects=editedProject,students=students,things=things,talmidim=talmidim,dvarim=dvarim)
 
 @app.route('/secret-page',methods=['GET','POST'])
-@requires_auth
 def secret_page():
-    projects=dbSession.query(Projects).all()
-    return render_template('secret_page.html',projects=projects)
+    form=Login()
+    if request.method=='POST':
+        if form.password.data=='Randomally':
+            projects=dbSession.query(Projects).all()
+            return render_template('secret_page.html',projects=projects)
+        else:
+            msg='Wrong Password please type again'
+            return render_template('login.html',form=form,msg=msg)
+    else:
+        msg=''
+    return render_template('login.html',form=form)
 
 @app.route('/gradeProject/<string:projectName>',methods=['GET','POST'])
 def gradeProject(projectName):
