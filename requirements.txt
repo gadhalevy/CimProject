@@ -1,7 +1,7 @@
-Flask==0.10.1
+Flask==0.12.2
 Jinja2==2.9.6
 Werkzeug==0.12.2
 Flask-Bootstrap==3.3.7.1
 Flask-WTF==0.14.2
-sqlalchemy==0.8.4
+sqlalchemy==1.2.0b2
 WTForms==2.1

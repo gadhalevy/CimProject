@@ -116,7 +116,7 @@ def fillStudent():
     count=1
     for l in lines[:-1]:
         _,first,last=l.split(',')
-        print count,first+' '+last
+        # print count,first+' '+last
         try:
             dbSession.add(Students(id=count,name=first+' '+last)) #Hebrew try fix later
             dbSession.commit()
@@ -167,7 +167,7 @@ def newGroup(pName,pDesc,id):
                 dbSession.commit()
             except:
                 dbSession.rollback()
-        print 'PName=',pName,'id=',id
+        # print 'PName=',pName,'id=',id
         return redirect(url_for('newGear',vals=vals,pName=pName,id=id))
     else:
         students=dbSession.query(Students).all()
@@ -179,7 +179,7 @@ def newGear(vals,pName,id):
     rhivim=[]
     if request.method=='POST':
         dvarim=request.form.getlist('davar')
-        print dvarim
+        # print dvarim
         for d in dvarim:
             thingInProj=ThngsProjs(idThings=d,idProj=id)
             try:
@@ -189,7 +189,7 @@ def newGear(vals,pName,id):
                 dbSession.commit()
             except:
                 dbSession.rollback()
-        print 'rhivim=',rhivim
+        # print 'rhivim=',rhivim
         return render_template('sikum.html',dvarim=rhivim,pName=pName,vals=vals,lst=lst)
     else:
         things=dbSession.query(Things).all()
