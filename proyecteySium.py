@@ -15,6 +15,7 @@ Bootstrap(app)
 app.secret_key = 'development key'
 
 engine = create_engine('postgresql:///try.db')
+# engine = create_engine('sqlite:///try.db')
 Base.metadata.create_all(engine)
 Base.metadata.bind = engine
 
@@ -284,6 +285,6 @@ def gradeProject(projectName):
 
 
 if __name__ == '__main__':
-    app.debug = True
-    app.run(host='0.0.0.0', port=5000)
-
+    # app.debug = True
+    # app.run(host='0.0.0.0', port=5000)
+    app.run()
