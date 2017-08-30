@@ -1,1 +1,1 @@
-web: gunicorn  projectsDBFlask.wsgi
+web: gunicorn  projectsDBFlask.application
