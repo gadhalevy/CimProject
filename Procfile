@@ -1,1 +1,1 @@
-web: gunicorn  proyecteySium.application
+web: gunicorn proyecteySium:app
