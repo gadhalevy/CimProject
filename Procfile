@@ -1,1 +1,1 @@
-web: gunicorn py_mrp.wsgi --log-file -
+web: gunicorn --pythonpath expense_manager wsgi
