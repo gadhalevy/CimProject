@@ -5,3 +5,4 @@ Flask-Bootstrap==3.3.7.1
 Flask-WTF==0.14.2
 sqlalchemy==1.2.0b2
 WTForms==2.1
+gunicorn==19.7.1
