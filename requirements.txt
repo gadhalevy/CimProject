@@ -9,3 +9,4 @@ SQLAlchemy==1.2.0b2
 virtualenv==15.1.0
 Werkzeug==0.12.2
 WTForms==2.1
+psycopg2==2.7.3.1
