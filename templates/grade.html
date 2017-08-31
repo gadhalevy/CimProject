@@ -6,6 +6,14 @@
 {% block content %}
 <div class="container" >
     <h3>Grade Project {{ projectName }}</h3>
-    {{ wtf.quick_form(form) }}
-    </div>
+    <form method="post" >
+        <select name="morim" class="form-control">
+            {% for g in guides %}
+                 <option id="guide" value="{{g}}">{{g}}</option><br>
+            {% endfor %}
+        </select><br>
+        <b>Please grade the project:</b><input type="text" name="grade"><br>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
 {% endblock %}

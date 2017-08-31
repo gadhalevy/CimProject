@@ -29,17 +29,18 @@ class NewProj(FlaskForm):
     teur=StringField(u'Description', validators=[DataRequired],widget=TextArea())
     submit = SubmitField("Define Group")
 
-def myFieldCheck(form,field):
+def myFieldCheck(field):
     if field.data<50 or field.data>100:
         raise ValidationError('Field must be between 50 and 100')
 
 class makeGrade(FlaskForm):
+    Guides = ['Sol', 'Yifaat', 'Dana', 'Gad']
     guide = SelectField(choices=zip(Guides,Guides))
     grade = IntegerField('Grade', validators=[myFieldCheck])
     submit = SubmitField("Grade Project")
 
 class Login(FlaskForm):
-    guide = SelectField(choices=zip(Guides,Guides))
+    guide = StringField('Guide',validators=[DataRequired])
     password = PasswordField('Password',validators=[DataRequired])
     submit = SubmitField("Check Password")
 
@@ -254,25 +255,26 @@ def editProject(projectName):
 def secret_page():
     form=Login()
     if request.method=='POST':
-        if form.password.data=='Randomally':
+        if form.guide.data in Guides and form.password.data=='Randomally':
             projects=dbSession.query(Projects).all()
             return render_template('secret_page.html',projects=projects)
         else:
-            msg='Wrong Password please type again'
+            msg='Wrong User or wrong Password please type again'
             return render_template('login.html',form=form,msg=msg)
     else:
         msg=''
-    return render_template('login.html',form=form)
+    return render_template('login.html',form=form,msg=msg)
 
 @app.route('/gradeProject/<string:projectName>',methods=['GET','POST'])
 def gradeProject(projectName):
     gradedProject = dbSession.query(Projects).filter_by(name=projectName).one()
-    form = makeGrade()
+    # form = makeGrade()
     if request.method=="POST":
-        guide = form.guide.data
-        grade = form.grade.data
+        guide = request.form.get("morim")
+        grade = request.form["grade"]
+        print (guide,grade)
         gradedProject.guide = guide
-        gradedProject.grade = grade
+        gradedProject.grade = int(grade)
         try:
             dbSession.add(gradedProject)
             dbSession.commit()
@@ -281,7 +283,7 @@ def gradeProject(projectName):
         projects=dbSession.query(Projects).all()
         return render_template('summary.html',projects=projects)
     else:
-        return render_template('grade.html',form=form,projectName=projectName)
+        return render_template('grade.html',guides=Guides,projectName=projectName)
 
 
 if __name__ == '__main__':
