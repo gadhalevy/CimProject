@@ -74,7 +74,6 @@ def makeQuery():
 
 @app.route('/')
 def start():
-    session.pop('username',None)
     lst=makeQuery()
     return render_template('report.html',rep=lst)
 
@@ -191,7 +190,10 @@ def newGear(vals,pName,id):
                 dbSession.commit()
             except:
                 dbSession.rollback()
-        # print 'rhivim=',rhivim
+        ans=dbSession.query(Projects.name,Students.name,Things.name).join(Students,ThngsProjs).\
+        filter(Things.id==ThngsProjs.idThings).filter(Projects.name=="%s" %pName).\
+        all()
+        print (ans)
         return render_template('sikum.html',dvarim=rhivim,pName=pName,vals=vals,lst=lst)
     else:
         things=dbSession.query(Things).all()
@@ -287,6 +289,6 @@ def gradeProject(projectName):
 
 
 if __name__ == '__main__':
-    # app.debug = True
-    # app.run(host='0.0.0.0', port=5000)
-    app.run()
+    app.debug = True
+    app.run(host='0.0.0.0', port=5000)
+    # app.run()
