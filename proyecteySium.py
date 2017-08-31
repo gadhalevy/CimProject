@@ -14,8 +14,8 @@ app = Flask(__name__)
 Bootstrap(app)
 app.secret_key = 'development key'
 
-engine = create_engine('postgresql:///try.db')
-# engine = create_engine('sqlite:///try.db')
+# engine = create_engine('postgresql:///try.db')
+engine = create_engine('sqlite:///try.db')
 Base.metadata.create_all(engine)
 Base.metadata.bind = engine
 
@@ -190,10 +190,10 @@ def newGear(vals,pName,id):
                 dbSession.commit()
             except:
                 dbSession.rollback()
-        ans=dbSession.query(Projects.name,Students.name,Things.name).join(Students,ThngsProjs).\
-        filter(Things.id==ThngsProjs.idThings).filter(Projects.name=="%s" %pName).\
-        all()
-        print (ans)
+        # ans=dbSession.query(Projects.name,Students.name,Things.name).join(Students,ThngsProjs).\
+        # filter(Things.id==ThngsProjs.idThings).filter(Projects.name=="%s" %pName).\
+        # all()
+        # print (ans)
         return render_template('sikum.html',dvarim=rhivim,pName=pName,vals=vals,lst=lst)
     else:
         things=dbSession.query(Things).all()
@@ -216,7 +216,7 @@ def editProject(projectName):
             dbSession.rollback()
         men=dbSession.query(Students).filter(Students.projectId==editedProject.id).all()
         for m in men:
-            m.projectId=''
+            m.projectId=None
             try:
                 dbSession.add(m)
                 dbSession.commit()
@@ -274,7 +274,7 @@ def gradeProject(projectName):
     if request.method=="POST":
         guide = request.form.get("morim")
         grade = request.form["grade"]
-        print (guide,grade)
+        # print (guide,grade)
         gradedProject.guide = guide
         gradedProject.grade = int(grade)
         try:
