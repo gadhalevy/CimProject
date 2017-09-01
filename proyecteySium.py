@@ -14,8 +14,8 @@ app = Flask(__name__)
 Bootstrap(app)
 app.secret_key = 'development key'
 
-# engine = create_engine('postgresql:///try.db')
-engine = create_engine('sqlite:///try.db')
+engine = create_engine('postgresql:///try.db')
+# engine = create_engine('sqlite:///try.db')
 Base.metadata.create_all(engine)
 Base.metadata.bind = engine
 
@@ -143,6 +143,8 @@ def fillProjects():
             dbSession.commit()
         except:
             dbSession.rollback()
+        project=dbSession.query(Projects).filter(Projects.name==name).one()
+        print project
         return redirect(url_for('newGroup',pName=name,pDesc=teur,id=project.id))
     else:
         return render_template('newProject.html',form=form)
@@ -190,13 +192,10 @@ def newGear(vals,pName,id):
                 dbSession.commit()
             except:
                 dbSession.rollback()
-        # ans=dbSession.query(Projects.name,Students.name,Things.name).join(Students,ThngsProjs).\
-        # filter(Things.id==ThngsProjs.idThings).filter(Projects.name=="%s" %pName).\
-        # all()
-        # print (ans)
         return render_template('sikum.html',dvarim=rhivim,pName=pName,vals=vals,lst=lst)
     else:
-        things=dbSession.query(Things).all()
+        things=dbSession.query(Things.id,Things.name,Types.name).\
+            filter(Types.id==Things.typeId).all()
         return render_template('newGear.html',vals=vals,lst=lst,pName=pName,things=things)
 
 @app.route('/editProject/<string:projectName>',methods=['GET','POST'])
@@ -253,12 +252,19 @@ def editProject(projectName):
         dvarim=dbSession.query(Things).all()
         return render_template('editProject.html',projects=editedProject,students=students,things=things,talmidim=talmidim,dvarim=dvarim)
 
+def graded():
+    ids=dbSession.query(ThngsProjs.idProj).all()
+    zihui=dbSession.query(Students.projectId).all()
+    projects = dbSession.query(Projects).filter(Projects.id.in_(ids)). \
+                filter(Projects.id.in_(zihui)).all()
+    return projects
+
 @app.route('/secret-page',methods=['GET','POST'])
 def secret_page():
     form=Login()
     if request.method=='POST':
         if form.guide.data in Guides and form.password.data=='Randomally':
-            projects=dbSession.query(Projects).all()
+            projects=graded()
             return render_template('secret_page.html',projects=projects)
         else:
             msg='Wrong User or wrong Password please type again'
@@ -282,7 +288,7 @@ def gradeProject(projectName):
             dbSession.commit()
         except:
             dbSession.rollback()
-        projects=dbSession.query(Projects).all()
+        projects=graded()
         return render_template('summary.html',projects=projects)
     else:
         return render_template('grade.html',guides=Guides,projectName=projectName)

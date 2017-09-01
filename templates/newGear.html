@@ -12,7 +12,7 @@
     <form method="post" >
         <select multiple name="davar" class="form-control">
             {% for thing in things %}
-                 <option id="thing"  value="{{thing.id}}">{{thing.name}}</option><br>
+                 <option id="thing"  value="{{thing[0]}}">{{thing[2]+" "}}{{thing[1]}}</option><br>
             {% endfor %}
         </select>
         <button type="submit" class="btn btn-primary">Submit</button>
