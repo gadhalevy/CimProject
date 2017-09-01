@@ -144,7 +144,7 @@ def fillProjects():
         except:
             dbSession.rollback()
         project=dbSession.query(Projects).filter(Projects.name==name).one()
-        print project
+        # print project
         return redirect(url_for('newGroup',pName=name,pDesc=teur,id=project.id))
     else:
         return render_template('newProject.html',form=form)
