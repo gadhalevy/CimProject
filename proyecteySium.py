@@ -7,8 +7,9 @@ from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
 from wtforms.validators import DataRequired
 from wtforms import StringField,SubmitField,IntegerField,ValidationError,SelectField,PasswordField
-
 from wtforms.widgets import TextArea
+import psycopg2
+import flask_psycopg2
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -45,7 +46,8 @@ class Login(FlaskForm):
     submit = SubmitField("Check Password")
 
 def makeQuery():
-    rep=dbSession.query(Projects.name,Students.name,Things.name).join(Students,ThngsProjs).\
+    rep=dbSession.query(Projects.name,Students.name,Things.name).\
+        join(Students,ThngsProjs).\
         filter(Things.id==ThngsProjs.idThings).\
         all()
     try:
