@@ -9,7 +9,7 @@ from wtforms.validators import DataRequired
 from wtforms import StringField,SubmitField,IntegerField,ValidationError,SelectField,PasswordField
 from wtforms.widgets import TextArea
 import psycopg2
-import flask_psycopg2
+# import flask_psycopg2
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -295,6 +295,34 @@ def gradeProject(projectName):
     else:
         return render_template('grade.html',guides=Guides,projectName=projectName)
 
+@app.route('/gradeProject/<int:projectId>',methods=['GET','POST'])
+def deleteProj(projectId):
+    if request.method=='POST':
+        res=dbSession.query(Projects).filter(Projects.id==projectId).one()
+        id=res.id
+        try:
+            dbSession.delete(res)
+            dbSession.commit()
+        except:
+            dbSession.rollback()
+        res=dbSession.query(ThngsProjs).filter(ThngsProjs.idProj==id).all()
+        try:
+            dbSession.delete(res)
+            dbSession.commit()
+        except:
+            dbSession.rollback()
+        res=dbSession.query(Students).filter(Students.projectId==projectId).all()
+        for r in res:
+            r.projectId=None
+            try:
+                dbSession.add(r)
+                dbSession.commit()
+            except:
+                dbSession.rollback()
+        return redirect(url_for('start'))
+    else:
+        project=dbSession.query(Projects).filter(Projects.id==projectId).one()
+        return render_template('delete.html',project=project)
 
 if __name__ == '__main__':
     app.debug = True
