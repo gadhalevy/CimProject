@@ -1,1 +1,1 @@
-web: gunicorn proyecteySium:wsgi --log-file -
+web: gunicorn proyecteySium:app
