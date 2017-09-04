@@ -9,6 +9,7 @@ from wtforms.validators import DataRequired
 from wtforms import StringField,SubmitField,IntegerField,ValidationError,SelectField,PasswordField
 from wtforms.widgets import TextArea
 import os
+import sqlalchemy
 
 # import flask_psycopg2
 app = Flask(__name__)
@@ -17,7 +18,7 @@ Bootstrap(app)
 
 app.secret_key = 'development key'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-engine=create_engine(app)
+engine=sqlalchemy(app)
 # engine = create_engine('postgresql:///try.db')
 # engine = create_engine('sqlite:///try.db')
 Base.metadata.create_all(engine)
