@@ -21,9 +21,9 @@ app.secret_key = 'development key'
 engine=Heroku(app)
 # engine = create_engine('postgresql:///try.db')
 # engine = create_engine('sqlite:///try.db')
-Base.metadata.create_all(engine)
-Base.metadata.bind = engine
-
+# Base.metadata.create_all(engine)
+# Base.metadata.bind = engine
+engine.create_all()
 DBSession = sessionmaker(bind=engine)
 dbSession = DBSession()
 
