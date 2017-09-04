@@ -8,15 +8,16 @@ from flask_wtf import FlaskForm
 from wtforms.validators import DataRequired
 from wtforms import StringField,SubmitField,IntegerField,ValidationError,SelectField,PasswordField
 from wtforms.widgets import TextArea
-
+import os
 # import flask_psycopg2
 app = Flask(__name__)
 Bootstrap(app)
 
 
 app.secret_key = 'development key'
-
-engine = create_engine('postgresql-triangular-48756')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+engine=create_engine(app)
+# engine = create_engine('stgresql:///try.db')
 # engine = create_engine('sqlite:///try.db')
 Base.metadata.create_all(engine)
 Base.metadata.bind = engine
