@@ -8,7 +8,7 @@ from flask_wtf import FlaskForm
 from wtforms.validators import DataRequired
 from wtforms import StringField,SubmitField,IntegerField,ValidationError,SelectField,PasswordField
 from wtforms.widgets import TextArea
-from flask.ext.heroku import Heroku
+from flask_heroku import Heroku
 # import flask_psycopg2
 app = Flask(__name__)
 Bootstrap(app)
