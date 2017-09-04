@@ -16,7 +16,7 @@ Bootstrap(app)
 
 app.secret_key = 'development key'
 
-engine = create_engine('postgresql:///try.db')
+engine = create_engine('postgresql-triangular-48756')
 # engine = create_engine('sqlite:///try.db')
 Base.metadata.create_all(engine)
 Base.metadata.bind = engine
