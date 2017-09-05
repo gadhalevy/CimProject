@@ -19,7 +19,7 @@ app.secret_key = 'development key'
 
 
 # engine = create_engine('postgresql:///try.db')
-engine = create_engine('postgresql+psycopg2:///try.db')
+engine = create_engine('postgresql+psycopg2://gadhalevy:cimhuikjr290488@DATABASE_URL')
 # engine = create_engine('sqlite:///try.db')
 Base.metadata.create_all(engine)
 Base.metadata.bind = engine
