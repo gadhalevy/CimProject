@@ -251,10 +251,17 @@ def editProject(projectName):
     else:
         students=dbSession.query(Students.name).filter(Students.projectId==editedProject.id).all()
         talmidim=dbSession.query(Students).all()
+        newStudents=[s[0][:-1] for s in students]
+        print newStudents,
+        print
+        for t in talmidim:
+            if t.name in newStudents:
+                print t.name
         things=dbSession.query(Things.name).filter(Things.id==ThngsProjs.idThings).\
             filter(ThngsProjs.idProj==editedProject.id).all()
         dvarim=dbSession.query(Things).all()
-        return render_template('editProject.html',projects=editedProject,students=students,things=things,talmidim=talmidim,dvarim=dvarim)
+        newThings=[t[0] for t in things]
+        return render_template('editProject.html',projects=editedProject,students=newStudents,things=newThings,talmidim=talmidim,dvarim=dvarim)
 
 def graded():
     ids=dbSession.query(ThngsProjs.idProj).all()
