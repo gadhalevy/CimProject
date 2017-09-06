@@ -251,12 +251,8 @@ def editProject(projectName):
     else:
         students=dbSession.query(Students.name).filter(Students.projectId==editedProject.id).all()
         talmidim=dbSession.query(Students).all()
-        newStudents=[s[0][:-1] for s in students]
-        print newStudents,
-        print
-        for t in talmidim:
-            if t.name in newStudents:
-                print t.name
+        print students
+        newStudents=[s[0] for s in students]
         things=dbSession.query(Things.name).filter(Things.id==ThngsProjs.idThings).\
             filter(ThngsProjs.idProj==editedProject.id).all()
         dvarim=dbSession.query(Things).all()
