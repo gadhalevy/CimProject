@@ -12,17 +12,13 @@
     <label for="talmid">Select Student:</label>
     <select multiple name="talmid" class="form-control">
             {% for ta in talmidim %}
-                {% for s in students %}
-                    <option id="talmid" value="{{ta.id}}" {% if s.name==ta.name %} selected=True {% endif %}>{{ ta.name }}</option><br>
-                {% endfor %}
+                    <option id="talmid" value="{{ta.id}}" {% if ta.name in students %} selected=True {% endif %}>{{ ta.name }}</option><br>
             {% endfor %}
     </select><br>
     <label for="davar">Select Equipment:</label>
     <select multiple name="davar" class="form-control">
             {% for d in dvarim %}
-                {% for t in things %}
-                    <option id="davar" value="{{d.id}}" {% if d.id==t.id %} selected=True {% endif %}>{{ d.name }}</option><br>
-                {% endfor %}
+                    <option id="davar" value="{{d.id}}" {% if d.name in things %} selected=True {% endif %}>{{ d.name }}</option><br>
             {% endfor %}
     </select><br>
     <button type="submit" class="btn btn-primary">Edit</button>

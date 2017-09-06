@@ -18,8 +18,7 @@ Bootstrap(app)
 app.secret_key = 'development key'
 
 
-# engine = create_engine('postgresql:///try.db')
-engine = create_engine('postgresql+psycopg2://gadhalevy:cimhuikjr290488@DATABASE_URL')
+engine = create_engine('postgresql:///try.db')
 # engine = create_engine('sqlite:///try.db')
 Base.metadata.create_all(engine)
 Base.metadata.bind = engine
@@ -250,9 +249,9 @@ def editProject(projectName):
                 dbSession.rollback()
         return redirect(url_for('start'))
     else:
-        students=dbSession.query(Students).filter(Students.projectId==editedProject.id).all()
+        students=dbSession.query(Students.name).filter(Students.projectId==editedProject.id).all()
         talmidim=dbSession.query(Students).all()
-        things=dbSession.query(Things).filter(Things.id==ThngsProjs.idThings).\
+        things=dbSession.query(Things.name).filter(Things.id==ThngsProjs.idThings).\
             filter(ThngsProjs.idProj==editedProject.id).all()
         dvarim=dbSession.query(Things).all()
         return render_template('editProject.html',projects=editedProject,students=students,things=things,talmidim=talmidim,dvarim=dvarim)
