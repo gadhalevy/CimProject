@@ -9,3 +9,4 @@ Werkzeug==0.12.2
 WTForms==2.1
 psycopg2==2.7.3.1
 flask-heroku==0.1.9
+flask_sqlalchemy==2.2
