@@ -8,16 +8,17 @@ from flask_wtf import FlaskForm
 from wtforms.validators import DataRequired
 from wtforms import StringField,SubmitField,IntegerField,ValidationError,SelectField,PasswordField
 from wtforms.widgets import TextArea
-from flask_sqlalchemy import SQLAlchemy
+# from flask_sqlalchemy import SQLAlchemy
 import os
+from flask_heroku import Heroku
 
 app = Flask(__name__)
 Bootstrap(app)
 
 
 app.secret_key = 'development key'
-app.config['SQLALCHEMY_DATABASE_URI']=os.environ['DATABASE_URL']
-engine=SQLAlchemy(app)
+# app.config['SQLALCHEMY_DATABASE_URI']=os.environ['DATABASE_URL']
+engine=Heroku(app)
 # engine = create_engine('postgresql:///try.db')
 # engine = create_engine('sqlite:///try.db')
 Base.metadata.create_all(engine)
