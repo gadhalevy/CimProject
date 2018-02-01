@@ -23,7 +23,7 @@ app.secret_key = 'development key'
 #engine = create_engine('postgresql:///try.db')
 #conn = psycopg2.connect(host='ec2-107-21-109-15.compute-1.amazonaws.com',database="dbl74bp8g6al84",user="wgbgkgefrjzdgo", password="24339a1a159f7ec5c37bd6aef78ee8dec218f76110ab98aead9631fb1becdf8c")
 #engine = create_engine('sqlite:///try.db')
-engine = create_engine(os.environ['DATABASE_URL'])
+engine = create_engine('postgres://wgbgkgefrjzdgo:24339a1a159f7ec5c37bd6aef78ee8dec218f76110ab98aead9631fb1becdf8c@ec2-107-21-109-15.compute-1.amazonaws.com:5432/dbl74bp8g6al84')
 Base.metadata.create_all(engine)
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
