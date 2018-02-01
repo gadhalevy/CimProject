@@ -10,6 +10,7 @@ from wtforms import StringField,SubmitField,IntegerField,ValidationError,SelectF
 from wtforms.widgets import TextArea
 # from flask_sqlalchemy import SQLAlchemy
 import os
+import psycopg2
 from flask_heroku import Heroku
 
 app = Flask(__name__)
@@ -18,11 +19,13 @@ Bootstrap(app)
 
 app.secret_key = 'development key'
 # app.config['SQLALCHEMY_DATABASE_URI']=os.environ['DATABASE_URL']
-engine=Heroku(app)
-# engine = create_engine('postgresql:///try.db')
-# engine = create_engine('sqlite:///try.db')
-# Base.metadata.create_all(engine)
-# Base.metadata.bind = engine
+#engine=Heroku(app)
+#engine = create_engine('postgresql:///try.db')
+#conn = psycopg2.connect(host='ec2-107-21-109-15.compute-1.amazonaws.com',database="dbl74bp8g6al84",user="wgbgkgefrjzdgo", password="24339a1a159f7ec5c37bd6aef78ee8dec218f76110ab98aead9631fb1becdf8c")
+#engine = create_engine('sqlite:///try.db')
+engine = create_engine(os.environ['DATABASE_URL'])
+Base.metadata.create_all(engine)
+Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 dbSession = DBSession()
 
@@ -49,12 +52,12 @@ class Login(FlaskForm):
     submit = SubmitField("Check Password")
 
 def makeQuery():
-    rep=dbSession.query(Projects.name,Students.name,Things.name).\
-        join(Students,ThngsProjs).\
-        filter(Things.id==ThngsProjs.idThings).\
-        all()
+    lst = []
     try:
-        lst=[]
+        rep=dbSession.query(Projects.name,Students.name,Things.name).\
+            join(Students,ThngsProjs).\
+            filter(Things.id==ThngsProjs.idThings).\
+            all()
         stuSet=set()
         thingSet=set()
         prev=rep[0][0]
@@ -73,7 +76,8 @@ def makeQuery():
         lst.append(cur)
         lst.append(stuSet)
         lst.append(thingSet)
-    except IndexError:
+    except:
+        lst=[]
         pass
     return lst
 
